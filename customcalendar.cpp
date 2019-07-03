@@ -12,7 +12,7 @@ CustomCalendar::CustomCalendar(QWidget *parent) : QWidget(parent)
     // Employee selection widget
     employeeDropdown = new QComboBox(this);
     populateEmployeeDropdown();
-    connect(employeeDropdown, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this, [this](){
+    connect(employeeDropdown, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentTextChanged), this, [this](){
         loadCellData();
     });
 
@@ -42,7 +42,7 @@ CustomCalendar::CustomCalendar(QWidget *parent) : QWidget(parent)
     for (int i = 2019; i < 2119; i++) {
         yearDropdown->addItem(QString::number(i));
     }
-    connect(yearDropdown, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this, [this](){
+    connect(yearDropdown, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentTextChanged), this, [this](){
         changeYear(yearDropdown->currentText().toInt());
     });
 
