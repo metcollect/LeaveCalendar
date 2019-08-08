@@ -25,18 +25,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++17
 
 SOURCES += \
-        calendarcell.cpp \
-        customcalendar.cpp \
         main.cpp \
-        mainwindow.cpp \
-        summarywindow.cpp
+        mainwindow.cpp
 
 HEADERS += \
-        calendarcell.h \
-        customcalendar.h \
-        data.h \
+        calendarview.hpp \
+        employee.hpp \
+        employeeconfigwindow.hpp \
         mainwindow.h \
-        summarywindow.h
+        summarywindow.hpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
