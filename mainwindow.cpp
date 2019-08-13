@@ -1,4 +1,4 @@
-#include "employeeconfigwindow.hpp"
+#include "editemployeewindow.hpp"
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -36,6 +36,41 @@ MainWindow::MainWindow(QWidget *parent) :
         loadCellData();
     });
 
+    auto addButton = new QPushButton(QIcon("res/add.png"), "");
+    connect(addButton, &QPushButton::clicked, this, [&](){
+        auto employee = new Employee();
+        auto eew = new EditEmployeeWindow(employee);
+        auto result = eew->exec();
+        if (result == QDialog::Accepted) {
+            employees.push_back(employee);
+            populateEmployeeDropdown();
+            employeeDropdown->setCurrentText(employee->getName());
+        } else {
+            delete employee;
+        }
+    });
+    auto editButton = new QPushButton(QIcon("res/edit.png"), "");
+    connect(editButton, &QPushButton::clicked, this, [&](){
+        if (currentEmployee != companyEmployee) {
+            auto eew = new EditEmployeeWindow(currentEmployee);
+            auto result = eew->exec();
+            if (result == QDialog::Accepted) {
+                populateEmployeeDropdown();
+                employeeDropdown->setCurrentText(currentEmployee->getName());
+            }
+        }
+    });
+    auto removeButton = new QPushButton(QIcon("res/rem.png"), "");
+    connect(removeButton, &QPushButton::clicked, this, [&](){
+        if (currentEmployee != companyEmployee) {
+            auto reply = QMessageBox::question(this, "Leave Calendar", "Delete " + currentEmployee->getName() + "?");
+            if (reply == QMessageBox::Yes) {
+                employees.removeAll(currentEmployee);
+                populateEmployeeDropdown();
+            }
+        }
+    });
+
     // Year selection widget
     yearDropdown = new QComboBox(this);
     for (int i = 2019; i < 2119; i++) {
@@ -51,6 +86,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Add widgets to top bar
     topRow->addWidget(employeeDropdown);
+    topRow->addWidget(addButton);
+    topRow->addWidget(editButton);
+    topRow->addWidget(removeButton);
     topRow->addStretch(1);
     topRow->addWidget(yearDropdown);
 
@@ -103,7 +141,6 @@ MainWindow::MainWindow(QWidget *parent) :
     populateEmployeeDropdown();
 
     qDebug() << "Finished constructor";
-    createEmployeeConfigWindow();
 }
 
 void MainWindow::loadCellData() {
@@ -125,6 +162,10 @@ void MainWindow::loadCellData() {
                 qDebug() << "Employee Holiday!" << date;
             }
 
+            if (cell->getDate() < currentEmployee->getStartDate()) {
+                vacationStatus = NONE;
+            }
+
             cell->setBackgroundColor(vacationStatus != NONE ? colors[vacationStatus] : cell->originalBackgroundColor);
         }
     }
@@ -136,7 +177,7 @@ void MainWindow::populateEmployeeDropdown() {
     employeeDropdown->clear(); // Empty dropdown contents
 
     foreach (auto employee, employees) {
-        qDebug() << "  " << employee->getName();
+        qDebug() << "\t" << employee->getName();
         employeeDropdown->addItem(employee->getName());
     }
 }
@@ -144,18 +185,22 @@ void MainWindow::populateEmployeeDropdown() {
 double MainWindow::getVacationCount(Employee* employee) {
     qDebug() << "getVacationCount()";
     // Merge unique employee and company holidays
-    auto dates = employee->getVacationData();
-    for (auto date : dates.keys()) {
-        dates[date] = dates[date];
+    auto dates = companyEmployee->getVacationData();
+    for (auto date : employee->getVacationData().keys()) {
+        dates[date] = employee->getVacationData()[date];
     }
+
+    qDebug() << dates;
 
     // Remove dates for other years
     auto start = QDate(currentYear, startingMonth, 1);
     foreach (auto date, dates.keys()) {
-        if (date < start || date >= start.addYears(1)) {
+        if (date < start || date >= start.addYears(1) || date < currentEmployee->getStartDate()) {
             dates.remove(date);
         }
     }
+
+    qDebug() << dates;
 
     // Separate Full days from half days
     auto fullDates = QVector<QDate>{};
@@ -174,10 +219,12 @@ double MainWindow::getVacationCount(Employee* employee) {
 void MainWindow::cellClicked() {
     auto cell = qobject_cast<CalendarCell*>(sender());
 
+    if (cell->getDate() < currentEmployee->getStartDate()) {
+        return;
+    }
+
     if (cell->getText().toInt() != 0) {
         auto menu = new QMenu(this);
-        menu->setStyleSheet("color: rgb(0, 0, 0);"
-                            "background-color: rgb(255, 255, 255);");
         menu->setAttribute(Qt::WA_DeleteOnClose);
 
         if (currentEmployee->getVacationData()[cell->getDate()] == NONE) {
@@ -213,6 +260,10 @@ void MainWindow::cellUpdated(CalendarCell* cell, VacationStatus status) {
     auto vd = currentEmployee->getVacationData();
     auto cvd = companyEmployee->getVacationData();
     auto date = cell->getDate();
+
+    if (cell->getDate() < currentEmployee->getStartDate()) {
+        return;
+    }
 
     switch(status) {
     case FULL:
@@ -267,25 +318,6 @@ void MainWindow::createSummaryWindow() {
 
 void MainWindow::updateStatistics() {
     vacationDaysLabel->setText("Total Vacation Days: " + QString::number(getVacationCount(currentEmployee)));
-}
-
-void MainWindow::createEmployeeConfigWindow() {
-    auto ecw = new EmployeeConfigWindow(this);
-    auto ecwLayout = ecw->getLayout();
-
-    for (auto employee : employees) {
-        auto name = new QLabel(employee->getName());
-        ecwLayout->addWidget(name);
-    }
-
-    auto newButton = new QPushButton("New");
-    connect(newButton, &QPushButton::clicked, this, [&](){
-        qDebug() << "New Employee!";
-    });
-    ecwLayout->addWidget(newButton);
-    //ecwLayout->insertWidget(1000, newButton);
-
-    ecw->show();
 }
 
 bool MainWindow::read() {

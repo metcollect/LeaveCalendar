@@ -63,7 +63,7 @@ public:
 private:
     QString name;
     QDate startDate;
-    QMap<QDate, int> vacationData;
+    QMap<QDate, int> vacationData = {};
 };
 
 #endif // EMPLOYEE_HPP

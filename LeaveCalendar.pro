@@ -30,8 +30,8 @@ SOURCES += \
 
 HEADERS += \
         calendarview.hpp \
+        editemployeewindow.hpp \
         employee.hpp \
-        employeeconfigwindow.hpp \
         mainwindow.h \
         summarywindow.hpp
 
@@ -42,6 +42,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     res/add.png \
+    res/edit.png \
     res/icon.png \
     res/icon.ico \
     res/rem.png
