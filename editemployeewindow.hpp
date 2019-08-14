@@ -17,18 +17,21 @@ class EditEmployeeWindow : public QDialog
     Q_OBJECT
 public:
     explicit EditEmployeeWindow(Employee *employee, QWidget *parent = nullptr) : QDialog(parent) {
-        layout = new QGridLayout(this);
-        layout->setColumnMinimumWidth(0, 200);
         setWindowTitle("Leave Calendar");
+        setAttribute(Qt::WA_DeleteOnClose);
+        setModal(true);
 
-        auto nameLabel = new QLabel("Name");
-        auto startDateLabel = new QLabel("Start Date");
+        const auto layout = new QGridLayout(this);
+        layout->setColumnMinimumWidth(0, 200);
+
+        const auto nameLabel = new QLabel("Name");
+        const auto startDateLabel = new QLabel("Start Date");
 
         layout->addWidget(nameLabel, 0, 0);
         layout->addWidget(startDateLabel, 0, 1);
 
-        nameEdit = new QLineEdit(employee->getName());
-        startDateEdit = new QDateEdit(QDate::currentDate());
+        const auto nameEdit = new QLineEdit(employee->getName());
+        const auto startDateEdit = new QDateEdit(QDate::currentDate());
 
         if (employee->getName() == "") {
             nameEdit->setPlaceholderText("New Employee");
@@ -44,7 +47,7 @@ public:
         auto cancelButton = buttonBox->button(QDialogButtonBox::Cancel);
         connect(cancelButton, &QPushButton::clicked, this, &EditEmployeeWindow::reject);
         auto confirmButton = buttonBox->button(QDialogButtonBox::Apply);
-        connect(confirmButton, &QPushButton::clicked, this, [&, employee]() mutable {
+        connect(confirmButton, &QPushButton::clicked, this, [&, employee, nameEdit, startDateEdit]() {
             employee->setName(nameEdit->text());
             employee->setStartDate(startDateEdit->date());
             qDebug() << "Accepted!";
@@ -53,11 +56,6 @@ public:
 
         layout->addWidget(buttonBox, 2, 0, 1, 2);
     }
-private:
-    QGridLayout *layout;
-
-    QLineEdit *nameEdit;
-    QDateEdit *startDateEdit;
 };
 
 #endif // EDITEMPLOYEEWINDOW_H

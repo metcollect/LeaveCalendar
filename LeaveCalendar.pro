@@ -33,7 +33,7 @@ HEADERS += \
         editemployeewindow.hpp \
         employee.hpp \
         mainwindow.h \
-        summarywindow.hpp
+        summarywidget.hpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

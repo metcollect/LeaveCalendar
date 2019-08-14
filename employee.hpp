@@ -13,19 +13,19 @@ public:
 
     }
 
-    QString getName() {
+    const QString &getName() {
         return name;
     }
 
-    void setName(QString name) {
+    void setName(const QString &name) {
         this->name = name;
     }
 
-    QDate getStartDate() {
+    const QDate &getStartDate() {
         return startDate;
     }
 
-    void setStartDate(QDate date) {
+    void setStartDate(const QDate &date) {
         this->startDate = date;
     }
 
@@ -33,17 +33,20 @@ public:
         return vacationData;
     }
 
-    void setVacationData(QMap<QDate, int> vacationData) {
+    void setVacationData(QMap<QDate, int> &vacationData) {
         this->vacationData = vacationData;
     }
 
     void read(const QJsonObject &json) {
-        setName(json["name"].toString());
-        setStartDate(QDate::fromString(json["startDate"].toString()));
+        const auto name = json["name"].toString();
+        const auto startDate = QDate::fromString(json["startDate"].toString());
         QMap<QDate, int> vacationMap;
         for (auto vacation : json["vacationData"].toArray()) {
             vacationMap[QDate::fromString(vacation.toObject()["date"].toString())] = vacation.toObject()["status"].toInt();
         }
+
+        setStartDate(startDate);
+        setName(name);
         setVacationData(vacationMap);
     }
 

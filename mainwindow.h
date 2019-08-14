@@ -16,8 +16,9 @@
 #include <QStandardPaths>
 
 #include "calendarview.hpp"
+#include "editemployeewindow.hpp"
 #include "employee.hpp"
-#include "summarywindow.hpp"
+#include "summarywidget.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -31,21 +32,20 @@ private:
     enum VacationStatus {
         NONE = 0,
         FULL = 1,
-        HALF = 2
+        HALF = 2,
+        SICK = 3
     };
 
-    QWidget *wid;
-    QGridLayout *layout;
-
-    CustomCalendar *calendar;
+    CalendarView *calendar;
     QComboBox *employeeDropdown, *yearDropdown;
-    QLabel *vacationDaysLabel;
+    QLabel *vacationDaysLabel, *sickDaysLabel;
 
 
     QVector<Employee*> employees;
     QMap<VacationStatus, QColor> colors = {
         std::pair<VacationStatus, QColor>(FULL, QColor(255, 0, 0)),
-        std::pair<VacationStatus, QColor>(HALF, QColor(255, 255, 0))
+        std::pair<VacationStatus, QColor>(HALF, QColor(255, 255, 0)),
+        std::pair<VacationStatus, QColor>(SICK, QColor(0, 255, 0))
     };
     Employee* companyEmployee = nullptr;
     Employee* currentEmployee = companyEmployee;
@@ -54,17 +54,17 @@ private:
 
     void loadCellData();
     void populateEmployeeDropdown();
-    double getVacationCount(Employee* employee);
-    void createSummaryWindow();
+    void getVacationCount(Employee *employee, double *vacations, double *sickDays);
     void updateStatistics();
-    void createEmployeeConfigWindow();
+    void createSummaryWindow();
+    void createColorConfigWindow();
 
     bool read();
     void write();
 
 private slots:
     void cellClicked();
-    void cellUpdated(CalendarCell* cell, VacationStatus status);
+    void cellUpdated(CalendarCell *cell, VacationStatus status);
 };
 
 #endif // MAINWINDOW_H
