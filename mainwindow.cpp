@@ -184,16 +184,19 @@ void MainWindow::populateEmployeeDropdown() {
     qDebug() << "Populating employee dropdown";
     employeeDropdown->clear(); // Empty dropdown contents
 
-    //QVector<QString> names;
-    //for (const auto &employee : employees) {
-    //    names.push_back(employee->getName());
-    //}
-
-    std::sort(employees.begin(), employees.end());
-
+    QVector<QString> names;
     for (const auto &employee : employees) {
-        qDebug() << "\t" << employee->getName();
-        employeeDropdown->addItem(employee->getName());
+        if (employee != companyEmployee) {
+            names.push_back(employee->getName());
+        }
+    }
+
+    std::sort(names.begin(), names.end());
+    names.insert(0, companyEmployee->getName());
+
+    for (const auto &name : names) {
+        qDebug() << "\t" << name;
+        employeeDropdown->addItem(name);
     }
 }
 

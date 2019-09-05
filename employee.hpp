@@ -14,10 +14,6 @@ public:
 
     }
 
-    friend bool operator<(const Employee& lhs, const Employee& rhs) {
-        return lhs.name < rhs.name;
-    }
-
     const QString &getName() {
         return name;
     }
