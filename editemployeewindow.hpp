@@ -3,7 +3,7 @@
 
 #include "employee.hpp"
 
-#include <QDateEdit>
+#include <QDateTimeEdit>
 #include <QDebug>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -31,7 +31,8 @@ public:
         layout->addWidget(startDateLabel, 0, 1);
 
         const auto nameEdit = new QLineEdit(employee->getName());
-        const auto startDateEdit = new QDateEdit(QDate::currentDate());
+        const auto startDateEdit = new QDateTimeEdit(QDate::currentDate());
+        startDateEdit->setCalendarPopup(true);
 
         if (employee->getName() == "") {
             nameEdit->setPlaceholderText("New Employee");

@@ -2,6 +2,7 @@
 #define EMPLOYEE_HPP
 
 #include <QDate>
+#include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
@@ -11,6 +12,10 @@ class Employee {
 public:
     explicit Employee() {
 
+    }
+
+    friend bool operator<(const Employee& lhs, const Employee& rhs) {
+        return lhs.name < rhs.name;
     }
 
     const QString &getName() {

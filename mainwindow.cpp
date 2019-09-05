@@ -184,7 +184,14 @@ void MainWindow::populateEmployeeDropdown() {
     qDebug() << "Populating employee dropdown";
     employeeDropdown->clear(); // Empty dropdown contents
 
-    foreach (const auto &employee, employees) {
+    //QVector<QString> names;
+    //for (const auto &employee : employees) {
+    //    names.push_back(employee->getName());
+    //}
+
+    std::sort(employees.begin(), employees.end());
+
+    for (const auto &employee : employees) {
         qDebug() << "\t" << employee->getName();
         employeeDropdown->addItem(employee->getName());
     }
@@ -442,6 +449,45 @@ void MainWindow::createColorConfigWindow() {
 bool MainWindow::read() {
     qDebug() << "Reading";
     const auto appDataLocation = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    // Load old save file if it exists
+    QFile oldFile(appDataLocation + "/vacations.dat");
+    if (oldFile.exists()) {
+        qDebug() << "Found old save file!";
+        if (!oldFile.open(QIODevice::ReadOnly)) {
+            qDebug() << "Failed to load data!";
+            return false;
+        }
+
+        QMap<QString, QVector<QPair<QDate, int>>> oldVacationData;
+        QDataStream ds(&oldFile);
+        ds.setVersion(QDataStream::Qt_5_0);
+        ds >> oldVacationData;
+        oldFile.close();
+
+        // Remove old save file
+        oldFile.remove();
+
+        for (auto &name : oldVacationData.keys()) {
+            const auto newEmployee = new Employee();
+            newEmployee->setName(name);
+
+            QMap<QDate, int> vacationData;
+
+            for (auto &pair : oldVacationData[name]) {
+                vacationData[pair.first] = pair.second;
+            }
+
+            newEmployee->setVacationData(vacationData);
+            employees.push_back(newEmployee);
+        }
+
+        // Save to new save file
+        write();
+        return true;
+    }
+
+
     QFile file(appDataLocation + "/vacations.json");
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "Failed to load data!";
