@@ -43,6 +43,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     res/add.png \
     res/edit.png \
-    res/icon.png \
     res/icon.ico \
+    res/icon.png \
     res/rem.png
+
+RESOURCES += \
+    res/resources.qrc

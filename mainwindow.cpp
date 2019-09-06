@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "Starting main window";
 
     setWindowTitle("Leave Calendar");
+    setWindowIcon(QIcon(":/res/icon.png"));
 
     const auto viewMenu = new QMenu("View", this);
     const auto viewSummaryAction = new QAction("View Summary", viewMenu);
@@ -43,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
         loadCellData();
     });
 
-    const auto addButton = new QPushButton(QIcon("res/add.png"), "");
+    const auto addButton = new QPushButton(QIcon(":/res/add.png"), "");
     connect(addButton, &QPushButton::clicked, this, [&](){
         const auto employee = new Employee();
         const auto eew = new EditEmployeeWindow(employee, this);
@@ -56,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
             delete employee;
         }
     });
-    const auto editButton = new QPushButton(QIcon("res/edit.png"), "");
+    const auto editButton = new QPushButton(QIcon(":/res/edit.png"), "");
     connect(editButton, &QPushButton::clicked, this, [&](){
         if (currentEmployee != companyEmployee) {
             const auto &employee = currentEmployee;
@@ -68,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
             }
         }
     });
-    const auto removeButton = new QPushButton(QIcon("res/rem.png"), "");
+    const auto removeButton = new QPushButton(QIcon(":/res/rem.png"), "");
     connect(removeButton, &QPushButton::clicked, this, [&](){
         if (currentEmployee != companyEmployee) {
             const auto reply = QMessageBox::question(this, "Leave Calendar", "Delete " + currentEmployee->getName() + "?");
